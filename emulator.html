@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emulator Player</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+    #game { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const core = params.get("core") || "gba";
+    const romUrl = params.get("rom");
+    const gameTitle = params.get("title") || "Retro Game";
+
+    window.EJS_player = "#game";
+    window.EJS_core = core;
+    window.EJS_gameName = gameTitle;
+    window.EJS_gameUrl = romUrl;
+    window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+    window.EJS_startOnLoaded = true;
+    window.EJS_color = "#00e5ff";
+
+    const script = document.createElement("script");
+    script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
