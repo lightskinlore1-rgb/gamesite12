@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathHub — Unified Portal</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --surface: #131823;
+      --surface-hover: #1b2232;
+      --border: #232c3d;
+      --accent: #00e5ff;
+      --accent-2: #7c4dff;
+      --text: #e6edf3;
+      --muted: #8b949e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* Top Navbar */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(11, 14, 20, 0.92); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px; display: flex; flex-wrap: wrap; gap: 14px;
+      align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.5px; }
+    .brand span { color: var(--accent); }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    input[type="search"] {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 8px 14px; border-radius: 8px; width: 230px; outline: none;
+    }
+    input[type="search"]:focus { border-color: var(--accent); }
+    button, .btn {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+      transition: 0.15s ease;
+    }
+    button:hover { background: var(--surface-hover); border-color: var(--accent); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-2), #4f46e5); border: none; color: #fff; }
+    .btn-primary:hover { opacity: 0.9; }
+
+    /* Category Bar */
+    .categories {
+      display: flex; gap: 8px; padding: 16px 24px 4px; flex-wrap: wrap;
+    }
+    .cat-btn.active { background: var(--accent); color: #05080c; border-color: var(--accent); }
+
+    /* Game Grid */
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px; padding: 20px 24px 60px;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; cursor: pointer; transition: transform 0.18s ease, border-color 0.18s ease;
+      display: flex; flex-direction: column;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .thumb {
+      height: 135px; background: #182030; display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; position: relative; overflow: hidden;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .badge {
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.75);
+      color: var(--accent); font-size: 0.7rem; font-weight: 700; padding: 3px 8px;
+      border-radius: 6px; border: 1px solid var(--border); text-transform: uppercase;
+    }
+    .card-body { padding: 12px 14px; }
+    .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .card-meta { color: var(--muted); font-size: 0.8rem; }
+
+    /* Player Overlay */
+    #player-modal {
+      display: none; position: fixed; inset: 0; background: #000; z-index: 100;
+      flex-direction: column;
+    }
+    .player-bar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 8px 16px; display: flex; justify-content: space-between; align-items: center;
+    }
+    #game-frame { flex: 1; width: 100%; border: none; background: #000; }
+
+    /* Boss Key Worksheet Disguise */
+    #boss-screen {
+      display: none; position: fixed; inset: 0; background: #ffffff; color: #111;
+      z-index: 9999; padding: 40px; overflow-y: auto; font-family: "Times New Roman", serif;
+    }
+    #boss-screen h1 { font-size: 1.6rem; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 20px; }
+    #boss-screen p { margin-bottom: 16px; font-size: 1.1rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+  <!-- Boss Key Disguise Screen (Press ~ or Esc) -->
+  <div id="boss-screen">
+    <h1>Algebra II — Unit 4: Rational Exponents & Radical Equations</h1>
+    <p><strong>Name:</strong> ___________________________ &nbsp;&nbsp;&nbsp; <strong>Period:</strong> ______</p>
+    <p>1. Simplify the expression completely: &nbsp; (27x⁶y⁹)^(2/3)</p>
+    <p>2. Solve for x and check for extraneous solutions: &nbsp; √(3x + 10) = x + 2</p>
+    <p>3. Rewrite in radical form and evaluate without a calculator: &nbsp; 64^(-3/2)</p>
+    <p>4. Find the inverse function f⁻¹(x) for: &nbsp; f(x) = 2(x - 4)³ + 5</p>
+    <p style="color:#666; font-size:0.85rem; margin-top:40px;">(Press ~ or Esc again to return)</p>
+  </div>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="brand">⚡ MATH<span>HUB</span></div>
+    <div class="controls">
+      <input type="search" id="search-input" placeholder="Search games..." />
+      <label class="btn" title="Load a .gba, .nds, .sfc, or .nes file from your computer">
+        📂 Load Local ROM
+        <input type="file" id="rom-picker" accept=".gba,.gbc,.gb,.nes,.sfc,.smc,.z64,.n64,.nds,.bin,.md" hidden />
+      </label>
+      <button onclick="exportAllSaves()">💾 Export Saves</button>
+      <label class="btn">
+        📥 Import Saves
+        <input type="file" id="save-importer" accept=".json" hidden />
+      </label>
+      <button class="btn-primary" onclick="toggleBossKey()">🛡️ Boss Key (~)</button>
+    </div>
+  </header>
+
+  <!-- Category Filters -->
+  <div class="categories" id="category-bar">
+    <button class="cat-btn active" data-cat="All">All</button>
+    <button class="cat-btn" data-cat="3D / WebGL">3D / WebGL</button>
+    <button class="cat-btn" data-cat="Emulator">Emulator</button>
+    <button class="cat-btn" data-cat="Arcade">Arcade</button>
+  </div>
+
+  <!-- Game Library Grid -->
+  <main class="grid" id="game-grid"></main>
+
+  <!-- Fullscreen Game Player Modal -->
+  <div id="player-modal">
+    <div class="player-bar">
+      <strong id="active-game-title">Playing Game</strong>
+      <div style="display:flex; gap:8px;">
+        <button onclick="goFullscreen()">⛶ Fullscreen</button>
+        <button onclick="exportAllSaves()">💾 Quick Backup</button>
+        <button style="background:#dc2626; border:none; color:#fff;" onclick="closeGame()">✕ Exit</button>
+      </div>
+    </div>
+    <iframe id="game-frame" allowfullscreen></iframe>
+  </div>
+
+  <script>
+    let allGames = [];
+    let currentCategory = "All";
+
+    // 1. Load Game Catalog from games.json
+    async function initPortal() {
+      try {
+        const res = await fetch("./games.json");
+        allGames = await res.json();
+        renderGames();
+      } catch (err) {
+        document.getElementById("game-grid").innerHTML =
+          `<p style="color:#f87171;">Failed to load games.json. Make sure you are running on GitHub Pages or a local server.</p>`;
+      }
+    }
+
+    // 2. Render Cards
+    function renderGames() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const grid = document.getElementById("game-grid");
+      grid.innerHTML = "";
+
+      const filtered = allGames.filter(g => {
+        const matchesCat = currentCategory === "All" || g.category === currentCategory;
+        const matchesSearch = g.title.toLowerCase().includes(query);
+        return matchesCat && matchesSearch;
+      });
+
+      filtered.forEach(game => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.onclick = () => launchGame(game);
+
+        const thumbHtml = game.thumbnail
+          ? `<img src="${game.thumbnail}" alt="${game.title}" loading="lazy" />`
+          : `<span>${game.icon || "🎮"}</span>`;
+
+        card.innerHTML = `
+          <div class="thumb">
+            ${thumbHtml}
+            <span class="badge">${game.badge || game.category}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">${game.title}</div>
+            <div class="card-meta">${game.subtitle || game.engine.toUpperCase()}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // 3. Launch Game (Routes to EmulatorJS or Direct WebGL Iframe)
+    function launchGame(game) {
+      const modal = document.getElementById("player-modal");
+      const frame = document.getElementById("game-frame");
+      document.getElementById("active-game-title").textContent = game.title;
+
+      if (game.engine === "emulatorjs") {
+        const params = new URLSearchParams({
+          core: game.core,
+          rom: game.romUrl,
+          title: game.title
+        });
+        frame.src = `./emulator.html?${params.toString()}`;
+      } else {
+        frame.src = game.gameUrl;
+      }
+      modal.style.display = "flex";
+    }
+
+    function closeGame() {
+      document.getElementById("game-frame").src = "about:blank";
+      document.getElementById("player-modal").style.display = "none";
+    }
+
+    function goFullscreen() {
+      const frame = document.getElementById("game-frame");
+      if (frame.requestFullscreen) frame.requestFullscreen();
+    }
+
+    // 4. Local ROM Picker (Play any ROM from your Chromebook Downloads/USB)
+    document.getElementById("rom-picker").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const ext = file.name.split(".").pop().toLowerCase();
+      const coreMap = {
+        gba: "gba", gbc: "gb", gb: "gb",
+        nes: "nes", sfc: "snes", smc: "snes",
+        z64: "n64", n64: "n64", nds: "nds",
+        md: "segaMD", bin: "segaMD"
+      };
+      const core = coreMap[ext] || "gba";
+      const blobUrl = URL.createObjectURL(file);
+
+      launchGame({
+        title: file.name,
+        engine: "emulatorjs",
+        core: core,
+        romUrl: blobUrl
+      });
+    });
+
+    // 5. Boss Key Disguise (~ or Escape)
+    function toggleBossKey() {
+      const boss = document.getElementById("boss-screen");
+      const isHidden = boss.style.display !== "block";
+      boss.style.display = isHidden ? "block" : "none";
+      document.title = isHidden ? "Algebra II — Unit 4 Worksheet" : "MathHub — Unified Portal";
+    }
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "`" || e.key === "~" || e.key === "Escape") toggleBossKey();
+    });
+
+    // 6. Universal Save Backup & Restore (localStorage + IndexedDB)
+    async function exportAllSaves() {
+      const backup = { timestamp: new Date().toISOString(), localStorage: {}, indexedDB: {} };
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        backup.localStorage[k] = localStorage.getItem(k);
+      }
+      if (window.indexedDB && indexedDB.databases) {
+        const dbs = await indexedDB.databases();
+        for (const dbInfo of dbs) {
+          if (!dbInfo.name) continue;
+          backup.indexedDB[dbInfo.name] = await dumpDatabase(dbInfo.name);
+        }
+      }
+      const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `mathhub-saves-${Date.now()}.json`;
+      a.click();
+    }
+
+    function dumpDatabase(dbName) {
+      return new Promise((resolve) => {
+        const req = indexedDB.open(dbName);
+        req.onsuccess = () => {
+          const db = req.result;
+          const out = {};
+          const stores = Array.from(db.objectStoreNames);
+          if (!stores.length) return resolve(out);
+          const tx = db.transaction(stores, "readonly");
+          stores.forEach(storeName => {
+            const store = tx.objectStore(storeName);
+            const items = [];
+            store.openCursor().onsuccess = (ev) => {
+              const cursor = ev.target.result;
+              if (cursor) {
+                items.push({ key: cursor.key, value: cursor.value });
+                cursor.continue();
+              } else {
+                out[storeName] = items;
+              }
+            };
+          });
+          tx.oncomplete = () => resolve(out);
+        };
+        req.onerror = () => resolve({});
+      });
+    }
+
+    document.getElementById("save-importer").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      const backup = JSON.parse(text);
+      if (backup.localStorage) {
+        Object.entries(backup.localStorage).forEach(([k, v]) => localStorage.setItem(k, v));
+      }
+      alert("Local saves restored! Reloading portal...");
+      location.reload();
+    });
+
+    // Category & Search Events
+    document.querySelectorAll(".cat-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = btn.dataset.cat;
+        renderGames();
+      });
+    });
+    document.getElementById("search-input").addEventListener("input", renderGames);
+
+    initPortal();
+  </script>
+</body>
+</html>
