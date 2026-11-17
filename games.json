@@ -1,0 +1,34 @@
+[
+  {
+    "id": "pokemon-unbound",
+    "title": "Pokémon Unbound",
+    "subtitle": "Game Boy Advance • ROM Hack",
+    "category": "Emulator",
+    "badge": "GBA",
+    "icon": "🐉",
+    "engine": "emulatorjs",
+    "core": "gba",
+    "romUrl": "https://cdn.jsdelivr.net/gh/lightskinlore1-rgb/gamesite12@main/library/roms/pokemon-unbound.gba"
+  },
+  {
+    "id": "dbz-supersonic",
+    "title": "DBZ: Supersonic Warriors",
+    "subtitle": "Game Boy Advance",
+    "category": "Emulator",
+    "badge": "GBA",
+    "icon": "🔥",
+    "engine": "emulatorjs",
+    "core": "gba",
+    "romUrl": "https://cdn.jsdelivr.net/gh/lightskinlore1-rgb/gamesite12@main/library/roms/dbz-supersonic.gba"
+  },
+  {
+    "id": "ultrakill-web",
+    "title": "Ultrakill (Web Port)",
+    "subtitle": "Unity WebGL • 3D FPS",
+    "category": "3D / WebGL",
+    "badge": "3D",
+    "icon": "🤖",
+    "engine": "iframe",
+    "gameUrl": "https://cdn.jsdelivr.net/gh/lightskinlore1-rgb/gamesite12@main/library/ultrakill/index.html"
+  }
+]
